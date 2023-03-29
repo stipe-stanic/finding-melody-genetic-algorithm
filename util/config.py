@@ -5,7 +5,7 @@ NUMBER_OF_NOTES = 12  # melody size
 NUMBER_OF_POSSIBLE_NOTES = 36
 CROSSOVER_RATE = 0.70  # recombination
 MUTATION_RATE = 0.25  # mutation
-REPRODUCTION_RATE = 0.40  # elitism
+REPRODUCTION_RATE = 0.40
 MAX_NUMBER_OF_GENERATIONS = 25000  # limit in case it takes too many iterations
 LIST_OF_POSSIBLE_NOTES = ['A4-0.5', 'B4-0.5', 'C4-0.5', 'D4-0.5', 'E4-0.5', 'F4-0.5', 'G4-0.5',
                           'A4b-0.5', 'B4b-0.5', 'D4b-0.5', 'E4b-0.5', 'G4b-0.5',

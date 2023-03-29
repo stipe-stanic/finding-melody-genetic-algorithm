@@ -57,9 +57,15 @@ def crossover(parents: List[Individual]) -> List[Individual]:
 
 # one-gene mutation
 def mutate(individuals: List[Individual]) -> None:
+    mutation_type = rd.choice(['swap', 'replace'])
+
     for individual in individuals:
-        idx = rd.randint(0, len(individual.notes) - 1)
-        individual.notes[idx] = rd.choice(LIST_OF_POSSIBLE_NOTES)
+        if mutation_type == 'swap':
+            idx1, idx2 = rd.sample(range(len(individual.notes)), 2)
+            individual.notes[idx1], individual.notes[idx2] = individual.notes[idx2], individual.notes[idx1]
+        else:
+            idx = rd.randint(0, len(individual.notes) - 1)
+            individual.notes[idx] = rd.choice(LIST_OF_POSSIBLE_NOTES)
 
 
 def next_generation(population: List[Individual]) -> List[Individual]:
@@ -97,9 +103,24 @@ def best_fitness(population: List[Individual]) -> Tuple[Individual, int]:
 
     return population[max_idx], max_fitness
 
+def play_notes(notes: List[str]):
+    player = musicalbeeps.Player(volume=0.15, mute_output=False)
+
+    for note in notes:
+        note_to_play = ''
+        duration_note = ''
+        flag = 0
+        for c in note:
+            if c != '-' and flag == 0:
+                note_to_play += c
+            elif c == '-':
+                flag = 1
+            else:
+                duration_note += c
+
+        player.play_note(note_to_play, float(duration_note))
 
 def solve_melody() -> Tuple[Individual, int]:
-    player = musicalbeeps.Player(volume=0.15, mute_output=False)
     population: List[Individual] = generate_initial_population()
 
     best_fitness_in_gen = 0
@@ -114,20 +135,7 @@ def solve_melody() -> Tuple[Individual, int]:
 
             print("|\n|\n|>>>>\n")
 
-            for note in best_individual_in_gen.notes:
-                note_to_play = ''
-                duration_note = ''
-                flag = 0
-                for c in note:
-                    if c != '-' and flag == 0:
-                        note_to_play += c
-                    elif c == '-':
-                        flag = 1
-                    else:
-                        duration_note += c
-
-                player.play_note(note_to_play, float(duration_note))
-
+            play_notes(best_individual_in_gen.notes)
             print("\n")
 
         if best_fitness_in_gen == MAX_FITNESS_VALUE:
@@ -139,20 +147,7 @@ def solve_melody() -> Tuple[Individual, int]:
     print_generation(population)
     print("|\n|\n|>>>>\n")
 
-    for note in best_individual_in_gen.notes:
-        note_to_play = ''
-        duration_note = ''
-        flag = 0
-        for c in note:
-            if c != '-' and flag == 0:
-                note_to_play += c
-            elif c == '-':
-                flag = 1
-            else:
-                duration_note += c
-
-        player.play_note(note_to_play, float(duration_note))
-
+    play_notes(best_individual_in_gen.notes)
     print("\n")
 
     return best_individual_in_gen, number_of_evolutions
