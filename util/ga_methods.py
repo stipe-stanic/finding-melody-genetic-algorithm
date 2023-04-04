@@ -5,6 +5,7 @@ from util.config import POPULATION_SIZE, NUMBER_OF_NOTES, MUTATION_RATE, REPRODU
     MAX_NUMBER_OF_GENERATIONS, MAX_FITNESS_VALUE, target_note, target_dict, LIST_OF_POSSIBLE_NOTES
 
 from entities.Individual import Individual
+from util.plotting import plot_fitness_function
 
 
 def generate_initial_population(count=POPULATION_SIZE) -> List[Individual]:
@@ -21,36 +22,32 @@ def generate_initial_population(count=POPULATION_SIZE) -> List[Individual]:
     return list(population)
 
 
-# k-tournament selection, N = 2
+# k-tournament selection
 def selection(population: List[Individual]) -> List[Individual]:
-    parents_temp: List[Individual] = []
     parents: List[Individual] = []
 
-    k: int = int(POPULATION_SIZE * (1 / 3))
-    n = 2
+    rd.shuffle(population)
 
-    for _ in range(n):
-        for j in range(k):
-            idx = rd.randint(0, len(population) - 1)
-            parents_temp.append(population[idx])
+    # tournament selection between all individuals
+    for i in range(len(population)):
+        j = rd.randint(0, len(population) - 1)
+        while i == j:
+            j = rd.randint(0, len(population) - 1)
+        if population[i].fitness() > population[j].fitness():
+            parents.append(population[i])
+        else:
+            parents.append(population[j])
 
-        max_idx, max_value = 0, -1
-        for j in range(len(parents_temp)):
-            if parents_temp[j].fitness() > max_value:
-                max_value = parents_temp[j].fitness()
-                max_idx = j
-
-        parents.append(parents_temp[max_idx])
-
-    return parents
+    # This returns a list of the two fittest individuals after performing tournament selection.
+    return sorted(parents, key=lambda x: x.fitness(), reverse=True)[:2]
 
 
-# one-point crossover
+# random one-point crossover
 def crossover(parents: List[Individual]) -> List[Individual]:
     crossover_point = rd.randint(1, NUMBER_OF_NOTES - 2)
 
     child1: List[str] = parents[0].notes[:crossover_point] + parents[1].notes[crossover_point:]
-    child2: List[str] = parents[0].notes[crossover_point:] + parents[1].notes[:crossover_point]
+    child2: List[str] = parents[1].notes[:crossover_point:] + parents[0].notes[crossover_point:]
 
     return [Individual(child1), Individual(child2)]
 
@@ -122,6 +119,7 @@ def play_notes(notes: List[str]):
 
 def solve_melody() -> Tuple[Individual, int]:
     population: List[Individual] = generate_initial_population()
+    curr_iteration_value = {}
 
     best_fitness_in_gen = 0
     best_individual_in_gen: Individual = population[0]
@@ -129,7 +127,9 @@ def solve_melody() -> Tuple[Individual, int]:
 
     for _ in range(MAX_NUMBER_OF_GENERATIONS):
         best_individual_in_gen, best_fitness_in_gen = best_fitness(population)
-        if number_of_evolutions % 1000 == 0:
+        if number_of_evolutions % 200 == 0:
+            curr_iteration_value[number_of_evolutions] = best_fitness_in_gen
+
             print(target_note, MAX_FITNESS_VALUE, target_dict, "----> target_note")
             print_generation(population)
 
@@ -149,6 +149,9 @@ def solve_melody() -> Tuple[Individual, int]:
 
     play_notes(best_individual_in_gen.notes)
     print("\n")
+
+    curr_iteration_value[number_of_evolutions] = best_fitness_in_gen
+    plot_fitness_function(MAX_FITNESS_VALUE, number_of_evolutions, curr_iteration_value)
 
     return best_individual_in_gen, number_of_evolutions
 
