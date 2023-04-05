@@ -12,4 +12,4 @@ Converging to the predetermined set of notes using genetic algorithm methods.
 - Mutation: swapping two existing notes or replacing a random note with the new one
 
 ## Fitness function
-<img alt="Visualization of fitness function" height=70% src="/plots_img/fitness_function_02.png" width=70%/>
+<img alt="Visualization of fitness function" height=70% src="/plots_img/fitness_function_03.png" width=70%/>
