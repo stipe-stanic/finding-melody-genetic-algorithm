@@ -1,18 +1,21 @@
 from typing import List, Dict, Tuple
+
+from entities import Note
 from util.config import target_note
 from util.config import target_dict
 
 
+
 # one melody solution
 class Individual:
-    def __init__(self, notes: List[str]):
+    def __init__(self, notes: List[Note]):
         self.notes = notes
-        self.dict_notes: Dict[Tuple | str, int] = {}
+        self.dict_notes: Dict[Tuple | Note, int] = {}
 
         for note in notes:
             self.dict_notes[note] = self.dict_notes.get(note, 0) + 1  # increases number of occurrences of the given key
 
-        self.dict_notes: Dict[str, int] = dict(sorted(self.dict_notes.items()))
+        self.dict_notes: Dict[Note, int] = dict(sorted(self.dict_notes.items()))
 
     # str representation of object
     def __str__(self):
